@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import toast from 'react-hot-toast'
-import { FiPlus, FiTrash2, FiPlay, FiCpu, FiGlobe, FiGrid, FiSearch, FiX, FiClock, FiArrowRight, FiRefreshCw, FiSettings } from 'react-icons/fi'
+import { FiPlus, FiTrash2, FiPlay, FiCpu, FiGlobe, FiGrid, FiSearch, FiX, FiClock, FiArrowRight, FiRefreshCw, FiSettings, FiActivity } from 'react-icons/fi'
 
 const TYPE_LABELS = { web_scrape: '웹 수집', excel_process: '엑셀 처리' }
 const TYPE_ICONS = { web_scrape: FiGlobe, excel_process: FiGrid }
 const TYPE_COLORS = {
   web_scrape: 'bg-blue-50 text-blue-600 border-blue-100',
   excel_process: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+}
+const TYPE_GRADIENTS = {
+  web_scrape: 'from-blue-500 to-indigo-600',
+  excel_process: 'from-emerald-500 to-teal-600',
 }
 
 export default function AutomationsPage() {
@@ -59,7 +63,7 @@ export default function AutomationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-purple-500/20">
               <FiCpu size={14} />
             </div>
             업무 자동화
@@ -67,12 +71,12 @@ export default function AutomationsPage() {
           <p className="text-[10px] sm:text-xs text-gray-400 mt-1 ml-9 sm:ml-10">RPA 작업을 등록하고 관리합니다 · 총 {list.length}건</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} className="p-2.5 border border-gray-200 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition" title="새로고침">
+          <button onClick={load} className="p-2.5 border border-gray-200 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition active:scale-95" title="새로고침">
             <FiRefreshCw size={16} />
           </button>
           <Link
             to="/automations/new"
-            className="flex items-center gap-2 bg-gradient-to-r from-baikal-600 to-baikal-700 hover:from-baikal-700 hover:to-baikal-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm"
+            className="flex items-center gap-2 bg-gradient-to-r from-baikal-600 to-baikal-700 hover:from-baikal-500 hover:to-baikal-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm hover:shadow-md active:scale-95"
           >
             <FiPlus size={16} /> 새 자동화
           </Link>
@@ -87,10 +91,10 @@ export default function AutomationsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="자동화 이름으로 검색..."
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-baikal-500 focus:border-transparent outline-none bg-white"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-baikal-500/20 focus:border-baikal-400 outline-none bg-white transition-all hover:border-gray-300"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition">
               <FiX size={14} />
             </button>
           )}
@@ -112,28 +116,43 @@ export default function AutomationsPage() {
 
       {/* Automation Cards */}
       {loading ? (
-        <div className="text-center py-20 text-gray-400 text-sm">불러오는 중...</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5">
+              <div className="skeleton h-10 w-10 rounded-xl mb-4" />
+              <div className="skeleton h-5 w-3/4 mb-3" />
+              <div className="skeleton h-3 w-1/2 mb-2" />
+              <div className="skeleton h-3 w-1/3" />
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-          <FiCpu className="mx-auto text-gray-200 mb-3" size={48} />
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
+            <FiCpu className="text-purple-200" size={32} />
+          </div>
           <p className="text-gray-400 font-medium">{search || filterType !== 'all' ? '검색 결과가 없습니다' : '등록된 자동화가 없습니다'}</p>
           <p className="text-gray-300 text-sm mt-1">웹 데이터 수집, 엑셀 처리 등 반복 업무를 자동화하세요</p>
-          <Link to="/automations/new" className="inline-flex items-center gap-2 mt-4 bg-baikal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-baikal-700 transition">
+          <Link to="/automations/new" className="inline-flex items-center gap-2 mt-4 bg-gradient-to-r from-baikal-600 to-baikal-700 text-white px-4 py-2 rounded-xl text-sm hover:from-baikal-500 hover:to-baikal-600 transition-all shadow-sm">
             <FiPlus size={14} /> 첫 자동화 등록
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 stagger">
           {filtered.map((a) => {
             const TypeIcon = TYPE_ICONS[a.type] || FiCpu
+            const gradient = TYPE_GRADIENTS[a.type] || 'from-gray-500 to-gray-600'
             return (
               <Link
                 key={a.id}
                 to={`/automations/${a.id}`}
-                className="group bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-gray-200 transition-all duration-200 block"
+                className="group bg-white rounded-2xl border border-gray-100 p-5 card-hover block relative overflow-hidden"
               >
+                {/* Subtle gradient accent on top */}
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${TYPE_COLORS[a.type] || 'bg-gray-50 text-gray-400'}`}>
+                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300`}>
                     <TypeIcon size={18} />
                   </div>
                   <div className="flex items-center gap-1">
@@ -142,12 +161,16 @@ export default function AutomationsPage() {
                       disabled={runningId === a.id}
                       className={`p-2 rounded-lg transition ${
                         runningId === a.id
-                          ? 'bg-green-50 text-green-500 animate-pulse'
+                          ? 'bg-green-50 text-green-500'
                           : 'hover:bg-green-50 text-gray-300 hover:text-green-600'
                       }`}
                       title="실행"
                     >
-                      <FiPlay size={14} />
+                      {runningId === a.id ? (
+                        <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FiPlay size={14} />
+                      )}
                     </button>
                     <button
                       onClick={(e) => remove(a.id, e)}
@@ -161,7 +184,7 @@ export default function AutomationsPage() {
 
                 <h3 className="font-semibold text-gray-900 group-hover:text-baikal-700 transition">{a.name}</h3>
                 
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2.5 flex-wrap">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${TYPE_COLORS[a.type]}`}>
                     {TYPE_LABELS[a.type] || a.type}
                   </span>
